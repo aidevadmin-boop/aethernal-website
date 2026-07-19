@@ -1,0 +1,23 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- FINAL brand mark (locked 2026-07-15, flipped to light background +
+       plum accent 2026-07-15 when the Living Gradient system was adopted
+       as the primary brand palette — see BRAND_KIT.md §6). Background is
+       the system's neutral Midday tone (not a specific time-of-day mood,
+       since a static logo shouldn't read as tied to one hour). Letterforms
+       are baked vector paths extracted directly from the real Baskerville
+       font file (not a CSS font-family reference — a prior Didot version
+       hit a real bug where "font-family: Didot" silently resolved to Didot
+       Bold in some render pipelines, since Didot.ttc bundles
+       Regular/Italic/Bold as separate sub-faces). Baskerville has a genuine
+       native Greek lambda glyph, used as-is. No surrounding circle —
+       dropped per founder feedback ("I think the circle is what bothers
+       me"); the thin vertical plum thread-line between the letters is the
+       only remaining graphic device.
+  -->
+  <rect id="backdrop" x="0" y="0" width="512" height="512" fill="#F5F2EC"/>
+  <g id="icon">
+    <line x1="261.6" y1="102" x2="261.6" y2="410" stroke="#5B3A54" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M334 414Q256 226 256 170Q256 109 297.0 77.5Q338 46 404 46V0H1V46Q92 60 135 109Q153 130 167.5 154.5Q182 179 198.0 215.5Q214 252 235.5 304.5Q257 357 289 434L683 1375H722L1237 156Q1257 108 1293.0 80.5Q1329 53 1400 46V0H867V46Q917 46 949.5 49.0Q982 52 1000.5 60.5Q1019 69 1026.5 83.0Q1034 97 1034 118Q1034 129 1022.5 161.0Q1011 193 988 249L627 1123Z" fill="#2B2320" transform="translate(86.124,340) scale(0.12389380530973451,-0.12389380530973451)"/>
+    <path d="M1169 422H1217L1188 0H65V46H93Q194 46 223.5 73.0Q253 100 261.0 141.5Q269 183 269 353V1018Q269 1173 260.5 1222.0Q252 1271 221.5 1290.5Q191 1310 93 1310V1356H1062L1094 1018H1047Q1015 1160 968.5 1219.5Q922 1279 858.0 1294.5Q794 1310 652 1310H464V741H608Q707 741 746.5 758.0Q786 775 798.5 809.5Q811 844 811 944H858V480H811Q811 593 792.0 631.5Q773 670 736.5 681.5Q700 693 613 693H464V372Q464 131 495.0 88.5Q526 46 662 46H763Q870 46 939.0 73.5Q1008 101 1070.5 186.5Q1133 272 1169 422Z" fill="#2B2320" transform="translate(263.575,340) scale(0.12389380530973451,-0.12389380530973451)"/>
+  </g>
+</svg>

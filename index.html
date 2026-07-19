@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aethernal — a meditation practice built from your own words</title>
+<meta name="description" content="Aethernal listens, then returns your own language back to you as a personal Anchor. Join the waitlist for early access.">
+
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png">
+<link rel="apple-touch-icon" href="assets/favicon-192.png">
+
+<!-- Social share preview. og:url / og:image use a relative path for now —
+     once this site is deployed to its real domain (see DEPLOY.md), swap
+     these two to absolute URLs, since social crawlers won't resolve
+     relative paths from an unknown origin. -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Aethernal — a meditation practice built from your own words">
+<meta property="og:description" content="Aethernal listens, then returns your own language back to you as a personal Anchor. Join the waitlist for early access.">
+<meta property="og:image" content="assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Aethernal — a meditation practice built from your own words">
+<meta name="twitter:description" content="Aethernal listens, then returns your own language back to you as a personal Anchor. Join the waitlist for early access.">
+<meta name="twitter:image" content="assets/og-image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Sora:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --display: 'Fraunces', Georgia, 'Iowan Old Style', serif;
+    --body: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
+    --line: rgba(43,35,32,0.14);
+    --max: 1120px;
+    --ease: cubic-bezier(0.16,1,0.3,1);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: var(--body);
+    color: var(--live-text);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  a { color: inherit; }
+  ::selection { background: rgba(91,58,84,0.18); }
+
+  /* ---- the living gradient: one continuous surface behind the whole page ---- */
+  #living-bg {
+    position: fixed; inset: 0; z-index: -2;
+    background: var(--live-base);
+    transition: background 0.6s linear;
+  }
+  #living-bg::before, #living-bg::after {
+    content: ""; position: absolute; inset: -20%; border-radius: 50%; pointer-events: none;
+  }
+  #living-bg::before {
+    background: radial-gradient(circle at 24% 20%, var(--live-glowA) 0%, var(--live-glowA) 20%, transparent 60%);
+    animation: wobbleA 24s ease-in-out infinite;
+    transition: background 0.6s linear;
+  }
+  #living-bg::after {
+    background: radial-gradient(circle at 78% 74%, var(--live-glowB) 0%, var(--live-glowB) 17%, transparent 58%);
+    animation: wobbleB 28s ease-in-out infinite;
+    transition: background 0.6s linear;
+  }
+  @keyframes wobbleA {
+    0%   { opacity: 0.0; transform: translate(-2%, -2%) scale(1); }
+    35%  { opacity: 0.7; transform: translate(3%, 2%) scale(1.08); }
+    65%  { opacity: 0.5; transform: translate(1%, 4%) scale(1.04); }
+    100% { opacity: 0.0; transform: translate(-2%, -2%) scale(1); }
+  }
+  @keyframes wobbleB {
+    0%   { opacity: 0.0; transform: translate(2%, 1%) scale(1); }
+    45%  { opacity: 0.56; transform: translate(-3%, -2%) scale(1.1); }
+    75%  { opacity: 0.36; transform: translate(-1%, -4%) scale(1.05); }
+    100% { opacity: 0.0; transform: translate(2%, 1%) scale(1); }
+  }
+
+  /* ---- cursor-follow spotlight (desktop only, very low opacity — a whisper of
+       interactivity, not a gimmick) ---- */
+  #cursor-glow {
+    position: fixed; z-index: -1; inset: 0; pointer-events: none;
+    background: radial-gradient(circle 420px at var(--cx,50%) var(--cy,30%), rgba(255,255,255,0.35), transparent 70%);
+    opacity: 0; transition: opacity 0.5s ease;
+  }
+  .has-fine-pointer #cursor-glow { opacity: 1; }
+
+  .adaptive-text {
+    text-shadow: 0 1px 3px var(--live-text-shadow), 0 0px 16px var(--live-text-shadow);
+    transition: text-shadow 0.6s linear, color 0.6s linear;
+  }
+
+  /* ---- entrance + scroll reveal ---- */
+  .reveal {
+    opacity: 0; transform: translateY(16px);
+    transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+  }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+  .hero .reveal { transition-delay: var(--d, 0s); }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    #living-bg::before, #living-bg::after { animation: none; opacity: 0.35; }
+    html { scroll-behavior: auto; }
+    .halo-core, .halo-ring, .halo-sweep { animation: none !important; }
+  }
+
+  /* ---- nav ---- */
+  nav {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.1rem clamp(1.25rem, 4vw, 3rem);
+    background: var(--live-glass);
+    -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--live-glass-border);
+    transition: background 0.6s linear, border-color 0.6s linear;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+  .nav-logo svg { height: 26px; width: auto; display: block; }
+  .nav-logo span { font-family: var(--display); font-size: 1rem; letter-spacing: 0.02em; color: var(--live-text); transition: color 0.6s linear; }
+  .nav-links { display: flex; align-items: center; gap: clamp(1rem, 3vw, 2rem); font-size: 0.86rem; color: var(--live-text-muted); transition: color 0.6s linear; }
+  .nav-links a:not(.btn) { text-decoration: none; position: relative; }
+  .nav-links a:not(.btn)::after {
+    content: ""; position: absolute; left: 0; right: 100%; bottom: -3px; height: 1px;
+    background: currentColor; transition: right 0.35s var(--ease);
+  }
+  .nav-links a:not(.btn):hover { color: var(--live-text); }
+  .nav-links a:not(.btn):hover::after { right: 0; }
+  @media (max-width: 620px) { .nav-links a:not(.btn) { display: none; } }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--body); font-weight: 600; font-size: 0.86rem;
+    padding: 0.7rem 1.4rem; border-radius: 999px; cursor: pointer; border: none;
+    text-decoration: none; white-space: nowrap; position: relative; overflow: hidden;
+  }
+  .btn-primary {
+    background: var(--live-accent); color: var(--live-accent-text);
+    transition: background 0.6s linear, color 0.6s linear, transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 24px -10px var(--live-accent); }
+  .btn-primary:active { transform: translateY(0); }
+
+  section { position: relative; z-index: 1; padding: clamp(3.5rem, 9vw, 7rem) clamp(1.25rem, 4vw, 3rem); }
+  .wrap { max-width: var(--max); margin: 0 auto; }
+
+  /* ---- hero ---- */
+  .hero { padding-top: clamp(3.5rem, 10vw, 6rem); position: relative; }
+  .hero .wrap { max-width: 720px; text-align: center; position: relative; }
+
+  /* Signature element: the halo/orb — the same "Aperture Glow" motion
+     language the product itself uses (layered independently-drifting radial
+     blooms), placed front and center as the one memorable moment on the
+     page, not borrowed from an unrelated reference aesthetic. */
+  .halo-orb {
+    width: min(320px, 62vw); height: min(320px, 62vw);
+    margin: 0 auto 1.6rem; position: relative;
+  }
+  .halo-orb .halo-core, .halo-orb .halo-ring, .halo-orb .halo-sweep {
+    position: absolute; inset: 0; border-radius: 50%;
+  }
+  .halo-orb .halo-core {
+    background: radial-gradient(circle at 50% 45%, var(--live-glowA) 0%, var(--live-glowA) 30%, transparent 72%);
+    animation: haloBreathe 7s ease-in-out infinite;
+    transition: background 0.6s linear;
+  }
+  .halo-orb .halo-ring {
+    inset: 10%;
+    background: radial-gradient(circle at 55% 40%, var(--live-glowB) 0%, transparent 68%);
+    animation: haloBreathe 9s ease-in-out infinite 1.2s;
+    transition: background 0.6s linear;
+  }
+  .halo-orb .halo-sweep {
+    inset: 22%;
+    background: var(--live-glass);
+    -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+    border: 1px solid var(--live-glass-border);
+    box-shadow: 0 24px 60px -20px rgba(0,0,0,0.22);
+    transition: background 0.6s linear, border-color 0.6s linear;
+  }
+  @keyframes haloBreathe {
+    0%, 100% { opacity: 0.55; transform: scale(1); }
+    50% { opacity: 0.95; transform: scale(1.08); }
+  }
+
+  .eyebrow {
+    font-size: 0.76rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--live-text-muted); margin: 0 0 1.4rem;
+  }
+  h1.hero-title {
+    font-family: var(--display); font-weight: 500; font-size: clamp(2.4rem, 6vw, 4rem);
+    line-height: 1.06; letter-spacing: -0.01em; margin: 0 0 1.5rem; color: var(--live-text);
+  }
+  h1.hero-title em { font-style: italic; color: var(--live-accent); transition: color 0.6s linear; }
+  .hero-sub {
+    font-size: clamp(1.02rem, 2vw, 1.15rem); line-height: 1.65; color: var(--live-text-muted);
+    max-width: 540px; margin: 0 auto 2.6rem;
+  }
+
+  /* ---- waitlist form ---- */
+  .waitlist-form {
+    display: flex; gap: 0.6rem; max-width: 480px; margin: 0 auto; flex-wrap: wrap; justify-content: center;
+  }
+  .waitlist-form input[type="email"] {
+    flex: 1 1 260px; min-width: 0;
+    font-family: var(--body); font-size: 0.95rem;
+    padding: 0.85rem 1.1rem; border-radius: 999px;
+    border: 1px solid var(--live-glass-border);
+    background: var(--live-glass);
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    color: var(--live-text);
+    transition: background 0.6s linear, border-color 0.25s var(--ease), color 0.6s linear, box-shadow 0.25s var(--ease);
+  }
+  .waitlist-form input[type="email"]::placeholder { color: var(--live-text-muted); }
+  .waitlist-form input[type="email"]:focus,
+  .btn:focus-visible {
+    outline: none; border-color: var(--live-accent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--live-accent) 20%, transparent);
+  }
+  .waitlist-note { font-size: 0.78rem; color: var(--live-text-muted); margin-top: 0.9rem; }
+  .honeypot { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+  .form-success {
+    display: none;
+    max-width: 480px; margin: 0 auto; padding: 1.1rem 1.4rem; border-radius: 16px;
+    background: var(--live-glass); border: 1px solid var(--live-glass-border);
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    font-size: 0.92rem; color: var(--live-text);
+  }
+  body.submitted .waitlist-form,
+  body.submitted .waitlist-note { display: none; }
+  body.submitted .form-success { display: block; }
+
+  /* ---- glass section shell (readability over the moving gradient) ---- */
+  .panel {
+    background: var(--live-glass);
+    border: 1px solid var(--live-glass-border);
+    -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+    border-radius: 28px;
+    transition: background 0.6s linear, border-color 0.6s linear, transform 0.4s var(--ease), box-shadow 0.4s var(--ease);
+  }
+  .step.panel:hover { transform: translateY(-4px); box-shadow: 0 20px 50px -24px rgba(0,0,0,0.28); }
+
+  /* ---- how it works ---- */
+  .section-head { text-align: center; max-width: 620px; margin: 0 auto 3.2rem; }
+  .section-head .eyebrow { margin-bottom: 0.9rem; }
+  .section-head h2 {
+    font-family: var(--display); font-weight: 500; font-size: clamp(1.7rem, 3.4vw, 2.3rem);
+    color: var(--live-text); margin: 0; line-height: 1.15;
+  }
+  .steps {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;
+  }
+  @media (max-width: 780px) { .steps { grid-template-columns: 1fr; } }
+  .step { padding: 2.2rem 1.9rem; }
+  .step-num {
+    font-family: var(--display); font-size: 0.95rem; color: var(--live-accent);
+    transition: color 0.6s linear; margin-bottom: 1.1rem; display: block;
+  }
+  .step h3 {
+    font-family: var(--display); font-weight: 500; font-size: 1.2rem; color: var(--live-text);
+    margin: 0 0 0.6rem;
+  }
+  .step p { font-size: 0.92rem; line-height: 1.6; color: var(--live-text-muted); margin: 0; }
+
+  /* ---- anchor explainer ---- */
+  .anchor-row {
+    display: grid; grid-template-columns: 220px 1fr; gap: clamp(2rem, 5vw, 4rem); align-items: center;
+  }
+  @media (max-width: 720px) { .anchor-row { grid-template-columns: 1fr; text-align: center; } }
+  .halo-wrap { display: flex; justify-content: center; }
+  .halo {
+    width: 190px; height: 190px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    background: var(--live-glass); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    border: 1px solid var(--live-glass-border);
+    box-shadow: 0 18px 46px -16px rgba(0,0,0,0.22);
+    transition: background 0.6s linear, border-color 0.6s linear;
+  }
+  .halo span { font-family: var(--display); font-size: 0.98rem; color: var(--live-text); line-height: 1.35; padding: 0 1.3rem; transition: color 0.6s linear; }
+  .anchor-copy h2 {
+    font-family: var(--display); font-weight: 500; font-size: clamp(1.6rem, 3.2vw, 2.1rem);
+    color: var(--live-text); margin: 0 0 1rem; line-height: 1.2;
+  }
+  .anchor-copy p { font-size: 0.98rem; line-height: 1.7; color: var(--live-text-muted); margin: 0 0 0.9rem; max-width: 560px; }
+  .anchor-copy p:last-child { margin-bottom: 0; }
+  @media (max-width: 720px) { .anchor-copy p { margin-left: auto; margin-right: auto; } }
+
+  /* ---- quote ---- */
+  .quote-section .wrap { max-width: 760px; text-align: center; }
+  blockquote {
+    font-family: var(--display); font-style: italic; font-weight: 500;
+    font-size: clamp(1.4rem, 3vw, 1.9rem); line-height: 1.4; color: var(--live-text);
+    margin: 0; padding: 0;
+  }
+  blockquote::before, blockquote::after { content: none; }
+
+  /* ---- closing CTA ---- */
+  .closing { text-align: center; }
+  .closing .wrap { max-width: 560px; }
+  .closing h2 {
+    font-family: var(--display); font-weight: 500; font-size: clamp(1.7rem, 3.6vw, 2.3rem);
+    color: var(--live-text); margin: 0 0 1rem; line-height: 1.2;
+  }
+  .closing p { font-size: 0.98rem; color: var(--live-text-muted); margin: 0 0 2.2rem; line-height: 1.6; }
+
+  /* ---- footer ---- */
+  footer {
+    padding: 2.2rem clamp(1.25rem, 4vw, 3rem) 2.8rem;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+    border-top: 1px solid var(--live-glass-border);
+    transition: border-color 0.6s linear;
+  }
+  footer .nav-logo svg { height: 20px; }
+  footer small { color: var(--live-text-muted); font-size: 0.78rem; transition: color 0.6s linear; }
+</style>
+</head>
+<body>
+
+<div id="living-bg"></div>
+<div id="cursor-glow"></div>
+
+<nav>
+  <a href="#top" class="nav-logo" aria-label="Aethernal">
+    <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <line x1="261.6" y1="102" x2="261.6" y2="410" stroke="#5B3A54" stroke-width="4" stroke-linecap="round"/>
+      <path d="M334 414Q256 226 256 170Q256 109 297.0 77.5Q338 46 404 46V0H1V46Q92 60 135 109Q153 130 167.5 154.5Q182 179 198.0 215.5Q214 252 235.5 304.5Q257 357 289 434L683 1375H722L1237 156Q1257 108 1293.0 80.5Q1329 53 1400 46V0H867V46Q917 46 949.5 49.0Q982 52 1000.5 60.5Q1019 69 1026.5 83.0Q1034 97 1034 118Q1034 129 1022.5 161.0Q1011 193 988 249L627 1123Z" fill="#2B2320" transform="translate(86.124,340) scale(0.12389380530973451,-0.12389380530973451)"/>
+      <path d="M1169 422H1217L1188 0H65V46H93Q194 46 223.5 73.0Q253 100 261.0 141.5Q269 183 269 353V1018Q269 1173 260.5 1222.0Q252 1271 221.5 1290.5Q191 1310 93 1310V1356H1062L1094 1018H1047Q1015 1160 968.5 1219.5Q922 1279 858.0 1294.5Q794 1310 652 1310H464V741H608Q707 741 746.5 758.0Q786 775 798.5 809.5Q811 844 811 944H858V480H811Q811 593 792.0 631.5Q773 670 736.5 681.5Q700 693 613 693H464V372Q464 131 495.0 88.5Q526 46 662 46H763Q870 46 939.0 73.5Q1008 101 1070.5 186.5Q1133 272 1169 422Z" fill="#2B2320" transform="translate(263.575,340) scale(0.12389380530973451,-0.12389380530973451)"/>
+    </svg>
+  </a>
+  <div class="nav-links adaptive-text">
+    <a href="#how-it-works">How it works</a>
+    <a href="#anchor">What&rsquo;s an Anchor</a>
+    <a href="#waitlist" class="btn btn-primary">Join the waitlist</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="halo-orb reveal" style="--d:0s">
+      <div class="halo-core"></div>
+      <div class="halo-ring"></div>
+      <div class="halo-sweep"></div>
+    </div>
+    <p class="eyebrow adaptive-text reveal" style="--d:0.08s">Now taking early access requests</p>
+    <h1 class="hero-title adaptive-text reveal" style="--d:0.16s">A meditation practice built from <em>your own words</em>.</h1>
+    <p class="hero-sub adaptive-text reveal" style="--d:0.26s">Aethernal listens, then returns your own language back to you as a personal Anchor. Built once. Revisited on your own rhythm, not a schedule an app invented for you.</p>
+
+    <form id="waitlist" class="waitlist-form reveal" style="--d:0.34s" name="waitlist" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+      <input type="hidden" name="form-name" value="waitlist">
+      <p class="honeypot"><label>Don&rsquo;t fill this out: <input name="bot-field"></label></p>
+      <input type="email" name="email" placeholder="you@domain.com" required aria-label="Email address">
+      <button type="submit" class="btn btn-primary">Join the waitlist</button>
+    </form>
+    <p class="waitlist-note adaptive-text reveal" style="--d:0.4s">No spam. One email when Aethernal opens up, and nothing else.</p>
+    <div class="form-success" role="status">You&rsquo;re on the list. We&rsquo;ll reach out the moment Aethernal is ready for you.</div>
+  </div>
+</header>
+
+<section id="how-it-works">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow adaptive-text">How it works</p>
+      <h2 class="adaptive-text">Three steps, then it&rsquo;s yours.</h2>
+    </div>
+    <div class="steps">
+      <div class="step panel reveal" style="--d:0s">
+        <span class="step-num">01</span>
+        <h3>Say what&rsquo;s actually true</h3>
+        <p>A few honest prompts about who you are right now and what you&rsquo;re working toward. Not a personality quiz. No generic archetypes.</p>
+      </div>
+      <div class="step panel reveal" style="--d:0.08s">
+        <span class="step-num">02</span>
+        <h3>Aethernal builds your Anchor</h3>
+        <p>A personal meditation generated once, in language that&rsquo;s actually yours, not a script written for a stranger and read out loud to everyone.</p>
+      </div>
+      <div class="step panel reveal" style="--d:0.16s">
+        <span class="step-num">03</span>
+        <h3>Return to it, on your rhythm</h3>
+        <p>Weekly, twice a month, monthly, whatever pace keeps it meaningful. Repetition, not a constant stream of new content, is the point.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="anchor">
+  <div class="wrap anchor-row panel reveal" style="padding: clamp(2.2rem, 5vw, 3.5rem);">
+    <div class="halo-wrap">
+      <div class="halo"><span class="adaptive-text">Your<br>Anchor</span></div>
+    </div>
+    <div class="anchor-copy">
+      <h2 class="adaptive-text">What is an Anchor?</h2>
+      <p class="adaptive-text">An Anchor is the personal meditation Aethernal builds from what you tell it. The term comes from anchoring, a real technique for tying a feeling to a cue you can return to on purpose, not a marketing word invented to sound clever.</p>
+      <p class="adaptive-text">It's built once from your own bio-codified profile, your aspirations, patterns, and self-concept encoded into something the practice can actually speak back to you, then it stays yours to revisit, not a new one generated every time you open the app.</p>
+    </div>
+  </div>
+</section>
+
+<section class="quote-section">
+  <div class="wrap reveal">
+    <blockquote class="adaptive-text">&ldquo;A premium, ad-free, private space for growth, built for people who are already doing the work and want something that finally sounds like them.&rdquo;</blockquote>
+  </div>
+</section>
+
+<section class="closing" id="waitlist-bottom">
+  <div class="wrap reveal">
+    <h2 class="adaptive-text">Be first to build your Anchor.</h2>
+    <p class="adaptive-text">Early access opens in waves. Join now and you&rsquo;ll hear the moment your invite is ready.</p>
+    <a href="#waitlist" class="btn btn-primary">Join the waitlist</a>
+  </div>
+</section>
+
+<footer>
+  <a href="#top" class="nav-logo" aria-label="Aethernal">
+    <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <line x1="261.6" y1="102" x2="261.6" y2="410" stroke="#5B3A54" stroke-width="4" stroke-linecap="round"/>
+      <path d="M334 414Q256 226 256 170Q256 109 297.0 77.5Q338 46 404 46V0H1V46Q92 60 135 109Q153 130 167.5 154.5Q182 179 198.0 215.5Q214 252 235.5 304.5Q257 357 289 434L683 1375H722L1237 156Q1257 108 1293.0 80.5Q1329 53 1400 46V0H867V46Q917 46 949.5 49.0Q982 52 1000.5 60.5Q1019 69 1026.5 83.0Q1034 97 1034 118Q1034 129 1022.5 161.0Q1011 193 988 249L627 1123Z" fill="#2B2320" transform="translate(86.124,340) scale(0.12389380530973451,-0.12389380530973451)"/>
+      <path d="M1169 422H1217L1188 0H65V46H93Q194 46 223.5 73.0Q253 100 261.0 141.5Q269 183 269 353V1018Q269 1173 260.5 1222.0Q252 1271 221.5 1290.5Q191 1310 93 1310V1356H1062L1094 1018H1047Q1015 1160 968.5 1219.5Q922 1279 858.0 1294.5Q794 1310 652 1310H464V741H608Q707 741 746.5 758.0Q786 775 798.5 809.5Q811 844 811 944H858V480H811Q811 593 792.0 631.5Q773 670 736.5 681.5Q700 693 613 693H464V372Q464 131 495.0 88.5Q526 46 662 46H763Q870 46 939.0 73.5Q1008 101 1070.5 186.5Q1133 272 1169 422Z" fill="#2B2320" transform="translate(263.575,340) scale(0.12389380530973451,-0.12389380530973451)"/>
+    </svg>
+  </a>
+  <small class="adaptive-text">&copy; 2026 Aethernal. All rights reserved.</small>
+</footer>
+
+<script>
+// ---- Living Gradient: continuous time-of-day interpolation ----
+// Ported directly from logos/palette-exploration/continuous-time-gradient.html
+// (the bug-fixed reference implementation — see BRAND_KIT.md §2b). Do not
+// re-derive this logic; three real bugs were found and fixed here already:
+// HSL hue-rotation green cast, clock-tied text contrast collapse, and
+// interpolation-midpoint greeting timing.
+const ANCHORS = [
+  { time: 7*60,  eyebrow: "Morning", base: "#F1EFEC", glowA: "#C9D9E6", glowB: "#EBC5AE" },
+  { time: 13*60, eyebrow: "Midday",  base: "#F5F2EC", glowA: "#F0D9B0", glowB: "#D9E3E8" },
+  { time: 19*60, eyebrow: "Evening", base: "#F2E9DD", glowA: "#F6D9BE", glowB: "#E7A96A" },
+  { time: 23*60, eyebrow: "Night",   base: "#47303F", glowA: "#E7A96A", glowB: "#7C93AC" },
+];
+const DAY_CHROME   = { text: "#2B2320", textMuted: "#85786E", accent: "#5B3A54", accentText: "#F9F2ED", glass: "rgba(255,255,255,0.55)", glassBorder: "rgba(255,255,255,0.65)" };
+const NIGHT_CHROME = { text: "#F2EAE4", textMuted: "#B9A9A4", accent: "#E7A96A", accentText: "#2B2230", glass: "rgba(255,255,255,0.08)", glassBorder: "rgba(255,255,255,0.15)" };
+
+function hexToRgb(hex) {
+  const n = parseInt(hex.replace("#",""), 16);
+  return [(n>>16)&255, (n>>8)&255, n&255];
+}
+function rgbToHex(r,g,b) {
+  return "#" + [r,g,b].map(x => x.toString(16).padStart(2,"0")).join("");
+}
+function lerpColor(hexA, hexB, t) {
+  const [r1,g1,b1] = hexToRgb(hexA), [r2,g2,b2] = hexToRgb(hexB);
+  return rgbToHex(
+    Math.round(r1 + (r2-r1)*t),
+    Math.round(g1 + (g2-g1)*t),
+    Math.round(b1 + (b2-b1)*t)
+  );
+}
+function getBracket(minutes) {
+  const n = ANCHORS.length;
+  for (let i = 0; i < n; i++) {
+    const a = ANCHORS[i], b = ANCHORS[(i+1) % n];
+    let bTime = b.time, m = minutes;
+    if (bTime <= a.time) bTime += 1440;
+    if (m < a.time) m += 1440;
+    if (m >= a.time && m <= bTime) return { a, b, t: (m - a.time) / (bTime - a.time) };
+  }
+  return { a: ANCHORS[0], b: ANCHORS[1], t: 0 };
+}
+function relLuminance(hex) {
+  const [r,g,b] = hexToRgb(hex);
+  return (0.299*r + 0.587*g + 0.114*b) / 255;
+}
+
+const root = document.documentElement;
+function applyMinutes(minutes) {
+  const { a, b, t } = getBracket(minutes);
+  const liveBase = lerpColor(a.base, b.base, t);
+  root.style.setProperty("--live-base", liveBase);
+  root.style.setProperty("--live-glowA", lerpColor(a.glowA, b.glowA, t));
+  root.style.setProperty("--live-glowB", lerpColor(a.glowB, b.glowB, t));
+
+  const bgLum = relLuminance(liveBase);
+  const chrome = bgLum >= 0.5 ? DAY_CHROME : NIGHT_CHROME;
+  root.style.setProperty("--live-text", chrome.text);
+  root.style.setProperty("--live-text-muted", chrome.textMuted);
+  root.style.setProperty("--live-accent", chrome.accent);
+  root.style.setProperty("--live-accent-text", chrome.accentText);
+  root.style.setProperty("--live-glass", chrome.glass);
+  root.style.setProperty("--live-glass-border", chrome.glassBorder);
+  root.style.setProperty("--live-text-shadow", bgLum >= 0.5 ? "rgba(255,255,255,0.65)" : "rgba(0,0,0,0.55)");
+}
+function tick() {
+  const now = new Date();
+  applyMinutes(now.getHours()*60 + now.getMinutes());
+}
+tick();
+setInterval(tick, 30000); // re-check every 30s; the 0.6s CSS transitions make it read as continuous
+
+// ---- Entrance + scroll reveal ----
+// Hero .reveal elements get the .in class on load (staggered via --d).
+// Everything below the fold reveals once via IntersectionObserver as it
+// enters the viewport — a calm, one-time settle, not a repeating gimmick.
+requestAnimationFrame(() => {
+  document.querySelectorAll('.hero .reveal').forEach(el => el.classList.add('in'));
+});
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('in');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+document.querySelectorAll('.reveal:not(.hero .reveal)').forEach(el => revealObserver.observe(el));
+
+// ---- Cursor-follow spotlight (fine pointers only) ----
+if (window.matchMedia('(pointer: fine)').matches) {
+  document.body.classList.add('has-fine-pointer');
+  let raf = null, tx = 50, ty = 30;
+  window.addEventListener('pointermove', (e) => {
+    tx = (e.clientX / window.innerWidth) * 100;
+    ty = (e.clientY / window.innerHeight) * 100;
+    if (!raf) {
+      raf = requestAnimationFrame(() => {
+        root.style.setProperty('--cx', tx + '%');
+        root.style.setProperty('--cy', ty + '%');
+        raf = null;
+      });
+    }
+  });
+}
+
+// ---- Netlify Forms progressive-enhancement success state ----
+// The form works with zero JS (Netlify's own success redirect). This just
+// keeps the visitor on the page with an inline message when JS is available.
+const params = new URLSearchParams(window.location.search);
+if (params.get("submitted") === "true") {
+  document.body.classList.add("submitted");
+}
+const form = document.getElementById("waitlist");
+if (form && window.fetch) {
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
+    fetch("/", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: new URLSearchParams(data).toString() })
+      .then(() => {
+        document.body.classList.add("submitted");
+        history.replaceState(null, "", window.location.pathname + "?submitted=true");
+      })
+      .catch(() => { form.submit(); }); // fall back to a plain full-page submit if fetch fails
+  });
+}
+</script>
+
+</body>
+</html>
