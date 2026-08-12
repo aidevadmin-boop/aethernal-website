@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aethernal · Privacy Policy</title>
+<meta name="description" content="Aethernal's Privacy Policy.">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600&family=Sora:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --display: 'Fraunces', Georgia, 'Iowan Old Style', serif;
+    --body: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
+    --ivory: #F3EFE6;
+    --void: #0A0C18;
+    --mist: #232842;
+    --gold: #D3B57E;
+    --slate: #8891B0;
+    --max: 720px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--void);
+    color: var(--ivory);
+    font-family: var(--body);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--gold); }
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 64px 24px 96px; }
+  .eyebrow {
+    font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--slate); margin-bottom: 8px;
+  }
+  h1 {
+    font-family: var(--display); font-weight: 500; font-size: clamp(28px, 5vw, 38px);
+    margin: 0 0 8px;
+  }
+  .updated { color: var(--slate); font-size: 14px; margin-bottom: 32px; }
+  .notice {
+    background: var(--mist); border-radius: 12px; padding: 16px 20px;
+    font-size: 14px; color: var(--slate); margin-bottom: 40px;
+  }
+  h2 {
+    font-family: var(--display); font-weight: 500; font-size: 21px;
+    margin: 40px 0 12px; color: var(--ivory);
+  }
+  p, li { font-size: 15.5px; color: #DAD6CC; }
+  ul { padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  strong { color: var(--ivory); }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid rgba(243,239,230,0.12); vertical-align: top; }
+  th { color: var(--slate); font-weight: 500; }
+  .back { display: inline-block; margin-top: 48px; color: var(--slate); text-decoration: none; font-size: 14px; }
+  .back:hover { color: var(--ivory); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Aethernal</div>
+  <h1>Privacy Policy</h1>
+  <div class="updated">Last updated: August 1, 2026</div>
+
+  <div class="notice">This document is pending final legal review before Aethernal's public launch. If anything here conflicts with the version presented to you in the app, the in-app version controls.</div>
+
+  <h2>1. Who we are</h2>
+  <p>Aethernal ("Aethernal," "we," "us," or "our") is operated by Aethernal LLC. This policy explains what personal information Aethernal collects through the Aethernal mobile app (iOS and Android), why we collect it, who we share it with, and what choices you have.</p>
+  <p>Contact us about privacy at <strong>privacy@aethernal.app</strong>.</p>
+
+  <h2>2. What we collect</h2>
+  <p>Aethernal is a personalized meditation app. To generate a meditation session that's actually personal to you, we collect more identity-level information than a typical wellness app. We name every category here specifically, not just in general terms.</p>
+  <p><strong>Account information.</strong> When you use Aethernal, we create an account for you via Firebase Authentication. Depending on how you sign in, this may include an email address, or nothing more than an anonymous device-linked account identifier if you haven't linked an email or Google sign-in.</p>
+  <p><strong>Your identity and goals profile.</strong> During onboarding, and any time you update it afterward, we collect your own answers to prompts such as: how you picture your future self, a dream you rarely say out loud, what currently stands between you and that, your desired lifestyle, your preferred "inner voice" tone, and a completed sentence beginning "I am becoming someone who...". We also collect your selected mood/emotional-state tags at different points (onboarding and before/after each session), your preferred session length and guide voice, your reminder-time and notification preferences, and free-text answers you type into any "Other" field.</p>
+  <p><strong>Generated session content.</strong> Each personalized meditation ("Anchor") we generate for you is saved to your account: its title, the full generated script text, the generated audio file, its duration, its type, and your mood before and (if provided) after the session, plus whether you saved or favorited it.</p>
+  <p><strong>Subscription and purchase information.</strong> Subscription status and purchase history are managed by our payments partner, RevenueCat, and the app store you purchased through (Apple App Store or Google Play). We do not receive or store your payment card details ourselves. Apple/Google process all payments directly.</p>
+  <p><strong>Usage and quota data.</strong> We track how many minutes of generated session content your account has used against your plan's monthly allowance, to enforce the usage limits described in your plan.</p>
+  <p><strong>Diagnostic data.</strong> If the app crashes or encounters a technical error, we automatically collect a crash report via Firebase Crashlytics to help us fix the underlying bug. This does not include your identity/goals answers or session content, and is not linked to your account identity.</p>
+  <p><strong>Infrastructure logs.</strong> Like almost any cloud-hosted app, our infrastructure provider (Firebase/Google Cloud) automatically logs standard technical information for every request, your IP address, device/OS type, and app version, as a normal part of running the service securely. We don't use this for anything beyond operating and securing Aethernal.</p>
+  <p><strong>Crisis-language safety-net counter.</strong> If a free-text field you type appears to describe a crisis (see §7 below), we store a simple count of how many times this has happened on your account, so we can understand how often the safety net is triggering. We do not store the specific flagged text itself as a separate record beyond whatever you already saved as your normal answer.</p>
+  <p><strong>What we do NOT collect.</strong> Aethernal does not access your device contacts, photo library, precise location, browsing history on other apps or sites, or any advertising identifiers. Aethernal shows no ads and does not build advertising profiles.</p>
+
+  <h2>3. How we use what we collect</h2>
+  <ul>
+    <li>Your identity/goals answers, mood tags, and session preferences are sent to our AI script-generation provider (Anthropic) as context so it can write a meditation script personalized to what you actually told us. Not sold, and not used to train Anthropic's models. Aethernal calls Anthropic's commercial API directly (not the consumer Claude.ai product); by default, Anthropic does not use API customer inputs/outputs for model training unless a customer separately opts in, which Aethernal has not done.</li>
+    <li>The generated script text is sent to our text-to-speech provider (ElevenLabs) to produce the audio you hear.</li>
+    <li>Your usage/quota data lets us enforce the session limits included in your plan.</li>
+    <li>Your account and subscription status let us determine what you're entitled to access (Free tier, paid plan, or trial).</li>
+    <li>Crash reports help us find and fix bugs.</li>
+    <li>We do not use any of the above to show you ads, and we do not sell your personal information to third parties.</li>
+  </ul>
+
+  <h2>4. Who we share data with</h2>
+  <p>We share data only with the service providers ("processors") that help us run Aethernal, each acting on our instructions, and never for their own independent marketing use:</p>
+  <table>
+    <tr><th>Provider</th><th>What they receive</th><th>Why</th></tr>
+    <tr><td>Firebase / Google Cloud</td><td>Account identifier, identity/goals profile, session records, crash reports</td><td>Hosting, authentication, database, file storage, crash reporting</td></tr>
+    <tr><td>Anthropic (Claude)</td><td>Your identity/goals profile, mood tag, and session preferences (not your account identifier or contact info)</td><td>Generates your personalized meditation script</td></tr>
+    <tr><td>ElevenLabs</td><td>The generated script text</td><td>Converts your script into spoken audio</td></tr>
+    <tr><td>RevenueCat</td><td>Purchase/subscription events tied to your account</td><td>Manages subscription entitlements across Apple/Google</td></tr>
+    <tr><td>Apple App Store / Google Play</td><td>Payment details, purchase history</td><td>Processes your payment directly, Aethernal never sees your card details</td></tr>
+  </table>
+  <p>We do not sell personal information, and we do not share it with data brokers or advertising networks.</p>
+
+  <h2>5. Data security</h2>
+  <p>Your identity/goals profile and session data are stored in Firestore under strict per-account access rules: only you (authenticated as yourself) can read or write your own data, enforced at the database level, not just in app code. Generated audio files are similarly restricted to your own account. Usage-quota records can be read by you but can only ever be written by our backend systems, so quota can't be tampered with client-side.</p>
+
+  <h2>6. Your rights</h2>
+  <p>You can request a full export of your Aethernal data, or full deletion of your account and all associated data, at any time by contacting <strong>privacy@aethernal.app</strong>. We will complete deletion within 30 days, covering your Firestore profile and session records, your generated audio in Storage, and your subscription record in RevenueCat.</p>
+  <p><strong>How long we keep your data.</strong> We retain your identity/goals profile, session history, and usage data for as long as your account is active. If you delete your account, we delete this data within the same 30-day window above, except where we're required to keep limited records longer (for example, purchase records needed for tax/accounting purposes).</p>
+  <p>If you're located somewhere with additional statutory rights (for example, the EU's GDPR or California's CCPA/CPRA), those rights apply to you as well; contact us and we'll honor them regardless of where you're located. This includes the right to correct inaccurate information, and, since some of what we collect (your emotional-state/mood data) may qualify as "sensitive personal information" under CPRA, the right to direct us to limit our use of it to what's needed to provide the app itself, which is the only use we make of it in any case.</p>
+
+  <h2>7. Mental health disclaimer</h2>
+  <p>Aethernal asks about your emotional state and personal goals so it can personalize your sessions, but <strong>Aethernal is not a medical, therapeutic, or crisis service</strong>, and nothing in the app should be treated as clinical advice. If any free-text field you type appears to describe a crisis, the app will show you a supportive message pointing to the 988 Suicide &amp; Crisis Lifeline (US), this is a safety net, not Aethernal monitoring or responding to you directly, and it never blocks you from continuing to use the app.</p>
+
+  <h2>8. Children's privacy</h2>
+  <p>Aethernal is not directed at, and is not intended for use by, anyone under 18. We do not knowingly collect personal information from anyone under that age. If we learn we have, we will delete it.</p>
+
+  <h2>9. International data transfers</h2>
+  <p>Our service providers (Firebase/Google, Anthropic, ElevenLabs, RevenueCat) may process data in the United States or other countries. By using Aethernal, you understand your information may be processed outside your own country.</p>
+
+  <h2>10. Changes to this policy</h2>
+  <p>If we make material changes to this policy, we'll update the "Last updated" date above and, for significant changes, notify you in the app.</p>
+
+  <h2>11. Contact</h2>
+  <p>Questions about this policy: <strong>privacy@aethernal.app</strong><br>
+  General support: <strong>support@aethernal.app</strong></p>
+
+  <a class="back" href="../">&larr; Back to aethernal.app</a>
+</div>
+</body>
+</html>
