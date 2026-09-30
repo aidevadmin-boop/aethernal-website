@@ -111,7 +111,7 @@
   nav {
     position: sticky; top: 0; z-index: 10;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 1.1rem clamp(1.25rem, 4vw, 3rem);
+    padding: 1.1rem var(--gutter);
     background: var(--live-glass);
     -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
     border-bottom: 1px solid var(--live-glass-border);
@@ -144,11 +144,15 @@
   .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 24px -10px var(--live-accent); }
   .btn-primary:active { transform: translateY(0); }
 
-  section { position: relative; z-index: 1; padding: clamp(3.5rem, 9vw, 7rem) clamp(1.25rem, 4vw, 3rem); }
+  /* Side margin for every block of the page, phone to desktop (2026-09-30: on a
+     phone the hero ran edge to edge, because the hero is a <header> and only
+     <section> had side padding). */
+  :root { --gutter: clamp(1.5rem, 6vw, 3rem); }
+  section { position: relative; z-index: 1; padding: clamp(3.5rem, 9vw, 7rem) var(--gutter); }
   .wrap { max-width: var(--max); margin: 0 auto; }
 
   /* ---- hero ---- */
-  .hero { padding-top: clamp(3.5rem, 10vw, 6rem); position: relative; }
+  .hero { padding: clamp(3.5rem, 10vw, 6rem) var(--gutter) 0; position: relative; }
   .hero .wrap { max-width: 720px; text-align: center; position: relative; }
 
   /* Signature element: the halo/orb — the same "Aperture Glow" motion
@@ -228,6 +232,8 @@
     outline: none; border-color: var(--live-accent);
     box-shadow: 0 0 0 4px color-mix(in srgb, var(--live-accent) 20%, transparent);
   }
+  /* On a phone the email field and the button stack, each full width. */
+  @media (max-width: 520px) { .waitlist-form .btn { flex: 1 1 100%; } }
   .waitlist-note { font-size: 0.78rem; color: var(--live-text-muted); margin-top: 0.9rem; }
   .honeypot { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 
@@ -317,7 +323,7 @@
 
   /* ---- footer ---- */
   footer {
-    padding: 2.2rem clamp(1.25rem, 4vw, 3rem) 2.8rem;
+    padding: 2.2rem var(--gutter) 2.8rem;
     display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
     border-top: 1px solid var(--live-glass-border);
     transition: border-color 0.6s linear;
