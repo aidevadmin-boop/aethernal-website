@@ -375,6 +375,12 @@
       <input type="hidden" name="form-name" value="waitlist">
       <p class="honeypot"><label>Don&rsquo;t fill this out: <input name="bot-field"></label></p>
       <input type="email" name="email" placeholder="you@domain.com" required aria-label="Email address">
+      <!-- Where this sign-up came from (filled in from the tracking tag, if any). -->
+      <input type="hidden" name="source">
+      <input type="hidden" name="medium">
+      <input type="hidden" name="campaign">
+      <input type="hidden" name="content">
+      <input type="hidden" name="referrer">
       <button type="submit" class="btn btn-primary">Join the waitlist</button>
     </form>
     <p class="waitlist-note adaptive-text reveal" style="--d:0.4s">The first 50 on the waitlist get 30 days free. No spam.</p>
@@ -559,10 +565,17 @@ const params = new URLSearchParams(window.location.search);
 if (params.get("submitted") === "true") {
   document.body.classList.add("submitted");
 }
+document.querySelectorAll('a.btn[href="#waitlist"]').forEach((a) => {
+  a.addEventListener("click", () => { if (window.aeTrack) window.aeTrack("cta"); });
+});
 const form = document.getElementById("waitlist");
 if (form && window.fetch) {
   form.addEventListener("submit", (e) => {
     e.preventDefault();
+    const tags = window.aeTags || {};
+    ["source", "medium", "campaign", "content"].forEach((k) => { form.elements[k].value = tags[k] || ""; });
+    try { form.elements.referrer.value = tags.referrer ? new URL(tags.referrer).hostname : ""; } catch (err) { form.elements.referrer.value = ""; }
+    if (window.aeTrack) window.aeTrack("signup");
     const data = new FormData(form);
     fetch("/", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: new URLSearchParams(data).toString() })
       .then(() => {
@@ -574,5 +587,42 @@ if (form && window.fetch) {
 }
 </script>
 
+<!-- Visits for the Aethernal numbers page: one beacon per page view and per
+     sign-up, no cookies, nothing kept after the tab closes (see /privacy). -->
+<script>
+(function () {
+  var ENDPOINT = 'https://us-central1-aethernal-cca80.cloudfunctions.net/trackVisit';
+  var KEYS = ['source', 'medium', 'campaign', 'content'];
+  var tags = {};
+  try { tags = JSON.parse(sessionStorage.getItem('ae-tags') || '{}'); } catch (e) {}
+  var q = new URLSearchParams(location.search);
+  if (q.get('utm_source')) {
+    tags = { referrer: document.referrer || '' };
+    KEYS.forEach(function (k) { tags[k] = q.get('utm_' + k) || ''; });
+    try { sessionStorage.setItem('ae-tags', JSON.stringify(tags)); } catch (e) {}
+    KEYS.forEach(function (k) { q.delete('utm_' + k); });
+    var rest = q.toString();
+    history.replaceState(null, '', location.pathname + (rest ? '?' + rest : '') + location.hash);
+  } else if (!tags.referrer && document.referrer && document.referrer.indexOf(location.host) < 0) {
+    tags.referrer = document.referrer;
+    try { sessionStorage.setItem('ae-tags', JSON.stringify(tags)); } catch (e) {}
+  }
+  function send(type) {
+    var body = JSON.stringify({
+      type: type, path: location.pathname, lang: navigator.language || '',
+      referrer: tags.referrer || document.referrer || '',
+      source: tags.source || '', medium: tags.medium || '', campaign: tags.campaign || '', content: tags.content || ''
+    });
+    try {
+      if (navigator.sendBeacon) navigator.sendBeacon(ENDPOINT, body);
+      else fetch(ENDPOINT, { method: 'POST', body: body, keepalive: true, mode: 'cors' });
+    } catch (e) {}
+  }
+  window.aeTrack = send;
+  window.aeTags = tags;
+  if (!/[?&]submitted=true/.test(location.search)) send('view');
+})();
+</script>
+<!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d091025034a84c89a53a7d3ce1bde7ea"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>

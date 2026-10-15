@@ -61,7 +61,7 @@
 <div class="wrap">
   <div class="eyebrow">Aethernal</div>
   <h1>Privacy Policy</h1>
-  <div class="updated">Last updated: August 26, 2026</div>
+  <div class="updated">Last updated: October 15, 2026</div>
 
   <h2>1. Who we are</h2>
   <p>Aethernal ("Aethernal," "we," "us," or "our") is operated by Aethernal LLC. This policy explains what personal information Aethernal collects through the Aethernal mobile app (iOS and Android), why we collect it, who we share it with, and what choices you have.</p>
@@ -76,6 +76,7 @@
   <p><strong>Usage and quota data.</strong> We track how many minutes of generated session content your account has used against your plan's monthly allowance, to enforce the usage limits described in your plan.</p>
   <p><strong>Diagnostic data.</strong> If the app crashes or encounters a technical error, we automatically collect a crash report via Firebase Crashlytics to help us fix the underlying bug. This does not include your identity/goals answers or session content, and is not linked to your account identity.</p>
   <p><strong>Infrastructure logs.</strong> Like almost any cloud-hosted app, our infrastructure provider (Firebase/Google Cloud) automatically logs standard technical information for every request, your IP address, device/OS type, and app version, as a normal part of running the service securely. We don't use this for anything beyond operating and securing Aethernal.</p>
+  <p><strong>Website visits.</strong> When you visit aethernal.app, we count the visit so we know which posts and platforms bring people to us: the page, the site or post that sent you (its address only, for example instagram.com), any campaign tag in the link, your device type (phone, tablet or computer) and your browser language. We use no cookies and keep nothing on your device after you close the tab. To count a visitor once per day without identifying them, we combine your IP address and browser with a random value that changes every day and is deleted after two days; your IP address itself is never stored. We also use Cloudflare Web Analytics, which counts visits without cookies. If you join the waitlist, we keep your email address and where your visit came from, only to invite you when Aethernal opens.</p>
   <p><strong>Crisis-language safety-net counter.</strong> If a free-text field you type appears to describe a crisis (see §7 below), we store a simple count of how many times this has happened on your account, so we can understand how often the safety net is triggering. We do not store the specific flagged text itself as a separate record beyond whatever you already saved as your normal answer.</p>
   <p><strong>What we do NOT collect.</strong> Aethernal does not access your device contacts, photo library, precise location, browsing history on other apps or sites, or any advertising identifiers. Aethernal shows no ads and does not build advertising profiles.</p>
 
@@ -97,6 +98,7 @@
     <tr><td>Anthropic (Claude)</td><td>Your identity/goals profile, mood tag, and session preferences (not your account identifier or contact info)</td><td>Generates your personalized meditation script</td></tr>
     <tr><td>ElevenLabs</td><td>The generated script text</td><td>Converts your script into spoken audio</td></tr>
     <tr><td>RevenueCat</td><td>Purchase/subscription events tied to your account</td><td>Manages subscription entitlements across Apple/Google</td></tr>
+    <tr><td>Cloudflare</td><td>Standard information about a visit to aethernal.app (page, referring site, browser and device type)</td><td>Counts website visits, without cookies</td></tr>
     <tr><td>Apple App Store / Google Play</td><td>Payment details, purchase history</td><td>Processes your payment directly, Aethernal never sees your card details</td></tr>
   </table>
   <p>We do not sell personal information, and we do not share it with data brokers or advertising networks.</p>
@@ -127,5 +129,42 @@
 
   <a class="back" href="../">&larr; Back to aethernal.app</a>
 </div>
+<!-- Visits for the Aethernal numbers page: one beacon per page view and per
+     sign-up, no cookies, nothing kept after the tab closes (see /privacy). -->
+<script>
+(function () {
+  var ENDPOINT = 'https://us-central1-aethernal-cca80.cloudfunctions.net/trackVisit';
+  var KEYS = ['source', 'medium', 'campaign', 'content'];
+  var tags = {};
+  try { tags = JSON.parse(sessionStorage.getItem('ae-tags') || '{}'); } catch (e) {}
+  var q = new URLSearchParams(location.search);
+  if (q.get('utm_source')) {
+    tags = { referrer: document.referrer || '' };
+    KEYS.forEach(function (k) { tags[k] = q.get('utm_' + k) || ''; });
+    try { sessionStorage.setItem('ae-tags', JSON.stringify(tags)); } catch (e) {}
+    KEYS.forEach(function (k) { q.delete('utm_' + k); });
+    var rest = q.toString();
+    history.replaceState(null, '', location.pathname + (rest ? '?' + rest : '') + location.hash);
+  } else if (!tags.referrer && document.referrer && document.referrer.indexOf(location.host) < 0) {
+    tags.referrer = document.referrer;
+    try { sessionStorage.setItem('ae-tags', JSON.stringify(tags)); } catch (e) {}
+  }
+  function send(type) {
+    var body = JSON.stringify({
+      type: type, path: location.pathname, lang: navigator.language || '',
+      referrer: tags.referrer || document.referrer || '',
+      source: tags.source || '', medium: tags.medium || '', campaign: tags.campaign || '', content: tags.content || ''
+    });
+    try {
+      if (navigator.sendBeacon) navigator.sendBeacon(ENDPOINT, body);
+      else fetch(ENDPOINT, { method: 'POST', body: body, keepalive: true, mode: 'cors' });
+    } catch (e) {}
+  }
+  window.aeTrack = send;
+  window.aeTags = tags;
+  if (!/[?&]submitted=true/.test(location.search)) send('view');
+})();
+</script>
+<!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d091025034a84c89a53a7d3ce1bde7ea"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>

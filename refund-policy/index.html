@@ -78,5 +78,42 @@
 
   <a class="back" href="../">&larr; Back to aethernal.app</a>
 </div>
+<!-- Visits for the Aethernal numbers page: one beacon per page view and per
+     sign-up, no cookies, nothing kept after the tab closes (see /privacy). -->
+<script>
+(function () {
+  var ENDPOINT = 'https://us-central1-aethernal-cca80.cloudfunctions.net/trackVisit';
+  var KEYS = ['source', 'medium', 'campaign', 'content'];
+  var tags = {};
+  try { tags = JSON.parse(sessionStorage.getItem('ae-tags') || '{}'); } catch (e) {}
+  var q = new URLSearchParams(location.search);
+  if (q.get('utm_source')) {
+    tags = { referrer: document.referrer || '' };
+    KEYS.forEach(function (k) { tags[k] = q.get('utm_' + k) || ''; });
+    try { sessionStorage.setItem('ae-tags', JSON.stringify(tags)); } catch (e) {}
+    KEYS.forEach(function (k) { q.delete('utm_' + k); });
+    var rest = q.toString();
+    history.replaceState(null, '', location.pathname + (rest ? '?' + rest : '') + location.hash);
+  } else if (!tags.referrer && document.referrer && document.referrer.indexOf(location.host) < 0) {
+    tags.referrer = document.referrer;
+    try { sessionStorage.setItem('ae-tags', JSON.stringify(tags)); } catch (e) {}
+  }
+  function send(type) {
+    var body = JSON.stringify({
+      type: type, path: location.pathname, lang: navigator.language || '',
+      referrer: tags.referrer || document.referrer || '',
+      source: tags.source || '', medium: tags.medium || '', campaign: tags.campaign || '', content: tags.content || ''
+    });
+    try {
+      if (navigator.sendBeacon) navigator.sendBeacon(ENDPOINT, body);
+      else fetch(ENDPOINT, { method: 'POST', body: body, keepalive: true, mode: 'cors' });
+    } catch (e) {}
+  }
+  window.aeTrack = send;
+  window.aeTags = tags;
+  if (!/[?&]submitted=true/.test(location.search)) send('view');
+})();
+</script>
+<!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d091025034a84c89a53a7d3ce1bde7ea"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
