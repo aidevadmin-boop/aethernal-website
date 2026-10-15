@@ -2,15 +2,19 @@
 # (2026-10-15). Use aethernal.app/ig in the Instagram bio, /tt in TikTok,
 # /th on Threads, /fb on Facebook, /yt on YouTube, /dm in Instagram DMs.
 # Add a name after the slash to tag one post: aethernal.app/ig/r-208.
-/ig       /?utm_source=instagram&utm_medium=social                       302
-/ig/*     /?utm_source=instagram&utm_medium=social&utm_campaign=:splat   302
-/tt       /?utm_source=tiktok&utm_medium=social                          302
-/tt/*     /?utm_source=tiktok&utm_medium=social&utm_campaign=:splat      302
-/th       /?utm_source=threads&utm_medium=social                         302
-/th/*     /?utm_source=threads&utm_medium=social&utm_campaign=:splat     302
-/fb       /?utm_source=facebook&utm_medium=social                        302
-/fb/*     /?utm_source=facebook&utm_medium=social&utm_campaign=:splat    302
-/yt       /?utm_source=youtube&utm_medium=social                         302
-/yt/*     /?utm_source=youtube&utm_medium=social&utm_campaign=:splat     302
-/dm       /?utm_source=instagram&utm_medium=dm                           302
-/dm/*     /?utm_source=instagram&utm_medium=dm&utm_campaign=:splat       302
+#
+# Status 200 serves the home page at that address with no redirect
+# (Instagram distrusts bio links that redirect); the page itself reads the
+# platform from the address. Assets use absolute paths so they load here.
+/ig       /index.html   200
+/ig/*     /index.html   200
+/tt       /index.html   200
+/tt/*     /index.html   200
+/th       /index.html   200
+/th/*     /index.html   200
+/fb       /index.html   200
+/fb/*     /index.html   200
+/yt       /index.html   200
+/yt/*     /index.html   200
+/dm       /index.html   200
+/dm/*     /index.html   200

@@ -6,10 +6,10 @@
 <title>Aethernal · become who you know you're meant to be</title>
 <meta name="description" content="Aethernal shapes a personal meditation around the dream you rarely say out loud. Join the waitlist for early access.">
 
-<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
-<link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png">
-<link rel="apple-touch-icon" href="assets/favicon-192.png">
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">
+<link rel="apple-touch-icon" href="/assets/favicon-192.png">
 
 <!-- Social share preview. Absolute URLs (aethernal.app went live
      2026-07), since social crawlers won't resolve relative paths. -->
@@ -596,6 +596,17 @@ if (form && window.fetch) {
   var tags = {};
   try { tags = JSON.parse(sessionStorage.getItem('ae-tags') || '{}'); } catch (e) {}
   var q = new URLSearchParams(location.search);
+  // Short links (aethernal.app/ig, /tt, /th...) are served as this page
+  // directly, with no redirect: Instagram distrusts bio links that redirect
+  // (2026-10-15). The first part names the platform, the second the post.
+  var SHORT = { ig: ['instagram', 'social'], tt: ['tiktok', 'social'], th: ['threads', 'social'], fb: ['facebook', 'social'], yt: ['youtube', 'social'], dm: ['instagram', 'dm'] };
+  var parts = location.pathname.split('/').filter(Boolean);
+  if (SHORT[parts[0]]) {
+    q.set('utm_source', SHORT[parts[0]][0]);
+    q.set('utm_medium', SHORT[parts[0]][1]);
+    if (parts[1]) q.set('utm_campaign', decodeURIComponent(parts[1]).slice(0, 60));
+    history.replaceState(null, '', '/' + location.hash);
+  }
   if (q.get('utm_source')) {
     tags = { referrer: document.referrer || '' };
     KEYS.forEach(function (k) { tags[k] = q.get('utm_' + k) || ''; });
