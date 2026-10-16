@@ -237,6 +237,21 @@
   /* On a phone the email field and the button stack, each full width. */
   @media (max-width: 520px) { .waitlist-form .btn { flex: 1 1 100%; } }
   .waitlist-note { font-size: 0.78rem; color: var(--live-text-muted); margin-top: 0.9rem; }
+  .sample-play {
+    margin: 1.3rem auto 0; display: inline-flex; align-items: center; gap: 0.6rem;
+    font-family: var(--body); font-size: 0.9rem; color: var(--live-text);
+    background: var(--live-glass); border: 1px solid var(--live-glass-border);
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    padding: 0.6rem 1.1rem 0.6rem 0.7rem; border-radius: 999px; cursor: pointer;
+    transition: background 0.6s linear, color 0.6s linear, border-color 0.25s var(--ease);
+  }
+  .sample-play:hover { border-color: var(--live-accent); }
+  .sample-icon {
+    width: 1.9rem; height: 1.9rem; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+    background: var(--live-accent); color: var(--live-accent-text); font-size: 0.7rem; padding-left: 0.12rem;
+  }
+  .sample-play.playing .sample-icon { padding-left: 0; }
+  body.submitted .sample-play { display: none; }
   .honeypot { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 
   .form-success {
@@ -384,6 +399,11 @@
       <button type="submit" class="btn btn-primary">Join the waitlist</button>
     </form>
     <p class="waitlist-note adaptive-text reveal" style="--d:0.4s">The first 50 on the waitlist get 30 days free. We&rsquo;ll email you a few times before launch; reply STOP anytime.</p>
+    <!-- A one-minute sample of a real Anchor (2026-10-16): let people feel it before they give an email. -->
+    <button type="button" class="sample-play reveal" style="--d:0.46s" id="sample-play" aria-label="Play the first minute of an Anchor">
+      <span class="sample-icon" aria-hidden="true">&#9654;</span><span class="sample-label">Hear the first minute of an Anchor</span>
+    </button>
+    <audio id="sample-audio" src="/assets/audio/anchor-sample.mp3" preload="none"></audio>
     <div class="form-success" role="status">You&rsquo;re on the list. You&rsquo;ll hear from us before launch.</div>
   </div>
 </header>
@@ -568,6 +588,30 @@ if (params.get("submitted") === "true") {
 document.querySelectorAll('a.btn[href="#waitlist"]').forEach((a) => {
   a.addEventListener("click", () => { if (window.aeTrack) window.aeTrack("cta"); });
 });
+// ---- The one-minute Anchor sample ----
+const samplePlay = document.getElementById("sample-play");
+const sampleAudio = document.getElementById("sample-audio");
+if (samplePlay && sampleAudio) {
+  let counted = false;
+  const icon = samplePlay.querySelector(".sample-icon");
+  const label = samplePlay.querySelector(".sample-label");
+  const show = (playing) => {
+    samplePlay.classList.toggle("playing", playing);
+    icon.innerHTML = playing ? "&#10074;&#10074;" : "&#9654;";
+    label.textContent = playing ? "Pause" : "Hear the first minute of an Anchor";
+  };
+  samplePlay.addEventListener("click", () => {
+    if (sampleAudio.paused) {
+      sampleAudio.play();
+      if (!counted && window.aeTrack) { window.aeTrack("listen"); counted = true; }
+    } else {
+      sampleAudio.pause();
+    }
+  });
+  sampleAudio.addEventListener("play", () => show(true));
+  sampleAudio.addEventListener("pause", () => show(false));
+  sampleAudio.addEventListener("ended", () => { show(false); sampleAudio.currentTime = 0; });
+}
 const form = document.getElementById("waitlist");
 if (form && window.fetch) {
   form.addEventListener("submit", (e) => {
