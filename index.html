@@ -252,6 +252,31 @@
   }
   .sample-play.playing .sample-icon { padding-left: 0; }
   body.submitted .sample-play { display: none; }
+
+  /* ---- dream quiz (2026-10-26, approved by the founder in Nexus) ---- */
+  .quiz-open { margin: 0.9rem auto 0; display: block; font-family: var(--body); font-size: 0.9rem; color: var(--live-text);
+    background: none; border: 0; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+  .quiz-open:hover { color: var(--live-accent); }
+  body.submitted .quiz-open { display: none; }
+  dialog.quiz { border: 0; padding: 0; max-width: 440px; width: calc(100% - 32px); border-radius: 24px;
+    background: #FBF8F3; color: #2B2320; box-shadow: 0 40px 90px -30px rgba(43,35,32,.45); }
+  dialog.quiz::backdrop { background: rgba(43,35,32,.35); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+  .quiz-in { padding: 2rem 1.6rem 1.6rem; text-align: left; position: relative; }
+  .quiz-close { position: absolute; top: 0.9rem; right: 1rem; background: none; border: 0; font-size: 1.4rem; color: #8A7E76; cursor: pointer; }
+  .quiz-step { font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: #5B3A54; margin: 0 0 0.8rem; }
+  .quiz-q { font-family: var(--display); font-weight: 500; font-size: 1.55rem; line-height: 1.2; margin: 0 0 1.2rem; }
+  .quiz-opts { display: flex; flex-direction: column; gap: 0.5rem; }
+  .quiz-opts button { font-family: var(--body); font-size: 0.98rem; text-align: left; padding: 0.85rem 1.1rem; border-radius: 14px;
+    border: 1px solid rgba(43,35,32,.14); background: #fff; color: #2B2320; cursor: pointer; transition: border-color .2s, background .2s; }
+  .quiz-opts button:hover, .quiz-opts button:focus-visible { border-color: #5B3A54; background: #F5EEF2; outline: none; }
+  .quiz-result { font-family: var(--display); font-size: 1.25rem; line-height: 1.45; margin: 0 0 1.3rem; }
+  .quiz-result em { color: #5B3A54; }
+  .quiz-form { display: flex; flex-direction: column; gap: 0.55rem; }
+  .quiz-form input { font-family: var(--body); font-size: 1rem; padding: 0.85rem 1.1rem; border-radius: 999px; border: 1px solid rgba(43,35,32,.18); background: #fff; color: #2B2320; }
+  .quiz-form input:focus { outline: none; border-color: #5B3A54; box-shadow: 0 0 0 4px rgba(91,58,84,.15); }
+  .quiz-form button { font-family: var(--body); font-weight: 600; font-size: 0.98rem; padding: 0.9rem; border-radius: 999px; border: 0; background: #5B3A54; color: #F9F2ED; cursor: pointer; }
+  .quiz-note { font-size: 0.78rem; color: #8A7E76; margin: 0.7rem 0 0; }
+  .quiz-done { font-family: var(--display); font-size: 1.3rem; line-height: 1.4; margin: 0.4rem 0 0; }
   .honeypot { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 
   .form-success {
@@ -396,6 +421,7 @@
       <input type="hidden" name="campaign">
       <input type="hidden" name="content">
       <input type="hidden" name="referrer">
+      <input type="hidden" name="via">
       <button type="submit" class="btn btn-primary">Join the waitlist</button>
     </form>
     <p class="waitlist-note adaptive-text reveal" style="--d:0.4s">The first 50 on the waitlist get 30 days free. We&rsquo;ll email you a few times before launch; reply STOP anytime.</p>
@@ -404,6 +430,11 @@
       <span class="sample-icon" aria-hidden="true">&#9654;</span><span class="sample-label">Hear the first minute of an Anchor</span>
     </button>
     <audio id="sample-audio" src="/assets/audio/anchor-sample.mp3" preload="none"></audio>
+    <button type="button" class="quiz-open reveal" style="--d:0.5s" id="quiz-open">Not sure yet? Find your Anchor in 3 taps</button>
+    <dialog class="quiz" id="quiz" aria-label="Find your Anchor">
+      <div class="quiz-in" id="quiz-in"></div>
+    </dialog>
+
     <div class="form-success" role="status">You&rsquo;re on the list. You&rsquo;ll hear from us before launch.</div>
   </div>
 </header>
@@ -612,6 +643,55 @@ if (samplePlay && sampleAudio) {
   sampleAudio.addEventListener("pause", () => show(false));
   sampleAudio.addEventListener("ended", () => { show(false); sampleAudio.currentTime = 0; });
 }
+
+// Dream quiz (2026-10-26): three taps about their own dream, a result made
+// from the answers, then the email. Answers stay on the page; only totals are
+// counted (beacon type 'quiz'), never stored with the email.
+(function () {
+  const dlg = document.getElementById("quiz"), box = document.getElementById("quiz-in"), open = document.getElementById("quiz-open");
+  if (!dlg || !box || !open || !dlg.showModal) { if (open) open.style.display = "none"; return; }
+  const Q = [
+    { q: "What do you want more of?", a: [["calm", "Calm"], ["confidence", "Confidence"], ["love", "Love"], ["freedom", "Freedom"], ["purpose", "Purpose"]] },
+    { q: "When do you picture your dream life most?", a: [["asleep", "Falling asleep"], ["waking", "Waking up"], ["way", "On the way somewhere"], ["far", "When it feels far away"]] },
+    { q: "What usually gets in the way?", a: [["doubt", "I doubt it\u2019s possible"], ["forget", "I forget it by noon"], ["start", "I don\u2019t know where to start"], ["loud", "Life gets loud"]] },
+  ];
+  const WHEN = { asleep: "as you fall asleep", waking: "as you wake up", way: "on the way", far: "when it feels far" };
+  const WAY = { doubt: "doubts it\u2019s possible", forget: "forgets it by noon", start: "doesn\u2019t know where to start", loud: "gets drowned out" };
+  let ans = [];
+  const track = (content) => { try { if (window.aeTrack) window.aeTrack("quiz", content); } catch (e) {} };
+  const close = '<button class="quiz-close" type="button" aria-label="Close">&times;</button>';
+  function step(i) {
+    const s = Q[i];
+    box.innerHTML = close + '<p class="quiz-step">' + (i + 1) + ' of 3</p><h2 class="quiz-q">' + s.q + '</h2><div class="quiz-opts">' +
+      s.a.map(([k, l]) => '<button type="button" data-k="' + k + '">' + l + "</button>").join("") + "</div>";
+    box.querySelectorAll(".quiz-opts button").forEach((b) => b.addEventListener("click", () => {
+      ans[i] = [b.dataset.k, b.textContent];
+      if (i < 2) step(i + 1); else result();
+    }));
+    box.querySelector(".quiz-opts button").focus();
+  }
+  function result() {
+    track("done:" + ans.map((a) => a[0]).join("-"));
+    box.innerHTML = close + '<p class="quiz-step">Your Anchor</p><p class="quiz-result">You want more <em>' + ans[0][1].toLowerCase() +
+      "</em>. Your Anchor would meet you " + WHEN[ans[1][0]] + ", and speak to the part of you that " + WAY[ans[2][0]] +
+      ". <em>Become who you know you\u2019re meant to be.</em></p>" +
+      '<form class="quiz-form"><input type="email" required placeholder="you@domain.com" aria-label="Email address"><button type="submit">Get my Anchor first</button></form>' +
+      '<p class="quiz-note">Join the waitlist and get 30 days free. We\u2019ll email you a few times before launch; reply STOP anytime.</p>';
+    const f = box.querySelector("form");
+    f.querySelector("input").focus();
+    f.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const main = document.getElementById("waitlist");
+      main.elements.email.value = f.querySelector("input").value;
+      main.elements.via.value = "quiz";
+      main.requestSubmit ? main.requestSubmit() : main.dispatchEvent(new Event("submit", { cancelable: true }));
+      box.innerHTML = close + '<p class="quiz-done">You\u2019re on the list. You\u2019ll hear from us before launch.</p>';
+    });
+  }
+  box.addEventListener("click", (e) => { if (e.target.classList.contains("quiz-close")) dlg.close(); });
+  dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });
+  open.addEventListener("click", () => { ans = []; step(0); dlg.showModal(); track("start"); });
+})();
 const form = document.getElementById("waitlist");
 if (form && window.fetch) {
   form.addEventListener("submit", (e) => {
@@ -662,11 +742,11 @@ if (form && window.fetch) {
     tags.referrer = document.referrer;
     try { sessionStorage.setItem('ae-tags', JSON.stringify(tags)); } catch (e) {}
   }
-  function send(type) {
+  function send(type, content) {
     var body = JSON.stringify({
       type: type, path: location.pathname, lang: navigator.language || '',
       referrer: tags.referrer || document.referrer || '',
-      source: tags.source || '', medium: tags.medium || '', campaign: tags.campaign || '', content: tags.content || ''
+      source: tags.source || '', medium: tags.medium || '', campaign: tags.campaign || '', content: content || tags.content || ''
     });
     try {
       if (navigator.sendBeacon) navigator.sendBeacon(ENDPOINT, body);
